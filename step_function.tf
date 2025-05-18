@@ -1,5 +1,5 @@
 locals {
-  webhook_url = var.step_function.external_webhook_url != null ? var.step_function.external_webhook_url : resource.port_webhook.webhook[0].url
+  webhook_url = try(var.step_function.external_webhook_url, null) != null ? var.step_function.external_webhook_url : try(resource.port_webhook.webhook[0].url, null)
 }
 
 data "aws_caller_identity" "this" {

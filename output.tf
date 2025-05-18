@@ -1,13 +1,17 @@
 output "webhook" {
-  value = {
-    url = resource.port_webhook.webhook[0].url
-  }
+  value = try(
+    {
+      url = resource.port_webhook.webhook[0].url
+    }, null
+  )
 }
 
 output "step_function" {
-  value = {
-    arn = resource.aws_sfn_state_machine.this[0].arn
-  }
+  value = try(
+    {
+      arn = resource.aws_sfn_state_machine.this[0].arn
+    }, null
+  )
 }
 
 output "headers" {
