@@ -30,6 +30,24 @@ variable "step_function" {
   }
 }
 
+variable "events" {
+  type = object({
+    # Defaults to , "port-aws-reflection-rule"
+    rule_prefix = optional(string)
+
+    # Defaults to 'default'
+    event_bus = optional(string)
+  })
+
+  default  = null
+  nullable = true
+
+  validation {
+    condition     = var.events == null || var.step_function != null
+    error_message = "Enabling event subscription, requires 'step_function' to be defined as well."
+  }
+}
+
 variable "resources" {
   type = map(object({
     api = optional(object({
@@ -57,26 +75,39 @@ variable "resources" {
       relations  = optional(map(string))
       })
     )
+    events = optional(object({
+      pattern = any
+    }))
   }))
 
   validation {
     condition     = try(var.step_function, null) != null || alltrue([for resource in values(var.resources) : try(resource.api, null) == null])
-    error_message = "Specifying a resource 'api' does nothing, unless 'step_function' is also defined."
+    error_message = "Specifying a resource 'api' does nothing, unless 'var.estep_function' is also defined."
   }
 
   validation {
     condition     = try(var.webhook, null) != null || alltrue([for resource in values(var.resources) : try(resource.mapping, null) == null])
-    error_message = "Specifying a resource 'mapping' does nothing, unless 'webhook' is also defined."
+    error_message = "Specifying a resource 'mapping' does nothing, unless 'var.ewebhook' is also defined."
+  }
+
+  validation {
+    condition     = try(var.events, null) != null || alltrue([for resource in values(var.resources) : try(resource.events, null) == null])
+    error_message = "Specifying a resource 'events' does nothing, unless 'var.events' is also defined."
   }
 
   validation {
     condition     = try(var.webhook, null) == null || alltrue([for resource in values(var.resources) : try(resource.mapping, null) != null])
-    error_message = "When deploying the 'webhook', you must specify a mapping for all resources."
+    error_message = "When deploying 'var.webhook', you must specify a 'mapping' for all resources."
   }
 
   validation {
     condition     = try(var.step_function, null) == null || alltrue([for resource in values(var.resources) : try(resource.api, null) != null])
-    error_message = "When deploying the 'step_function', you must specify an api for all resources."
+    error_message = "When deploying the 'var.step_function', you must specify an 'api' for all resources."
+  }
+
+  validation {
+    condition     = try(var.events, null) == null || anytrue([for resource in values(var.resources) : try(resource.events, null) != null])
+    error_message = "Deploying 'var.events' does nothing, unless you also specify 'events' for at least one resource."
   }
 }
 
