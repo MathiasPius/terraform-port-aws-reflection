@@ -37,8 +37,18 @@ resource "aws_sfn_state_machine" "this" {
       {
         for blueprint, aws_resource in var.resources : "Fetch${aws_resource.api.type_name}s" =>
         {
-          Type     = "Task"
-          Resource = "arn:aws:states:::aws-sdk:${aws_resource.api.arn}"
+          Type = "Task"
+
+          # This is a convoluted way to just lower case the first letter of the api action:
+          #
+          # e.g. "rds:DescribeDBInstances" -> "rds:describeDBInstances"
+          Resource = "arn:aws:states:::aws-sdk:${join("",
+            [
+              split(":", aws_resource.api.action)[0], ":",
+              lower(substr(split(":", aws_resource.api.action)[1], 0, 1)),
+              substr(split(":", aws_resource.api.action)[1], 1, -1)
+            ]
+          )}"
           Arguments = {
             (aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Identifier") = "{% $states.input.${aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Identifier"} %}"
           }
@@ -190,7 +200,7 @@ data "aws_iam_policy_document" "step_function" {
   statement {
     sid       = "AllowDescribeTypes"
     effect    = "Allow"
-    actions   = [for aws_resource in var.resources : "${aws_resource.api.iam_action}"]
+    actions   = [for aws_resource in var.resources : "${aws_resource.api.action}"]
     resources = ["*"]
   }
 }

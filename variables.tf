@@ -57,8 +57,7 @@ variable "resources" {
       # DbInstance for example.
       type_name = string
 
-      arn             = string
-      iam_action      = string
+      action          = string
       delete_on_error = optional(list(string), [])
     }))
     mapping = optional(object({

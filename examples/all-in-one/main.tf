@@ -47,8 +47,7 @@ module "webhook" {
     (port_blueprint.rds.identifier) = {
       api = {
         type_name       = "DbInstance"
-        arn             = "rds:describeDBInstances"
-        iam_action      = "rds:DescribeDBInstances"
+        action          = "rds:DescribeDBInstances"
         delete_on_error = ["Rds.DbInstanceNotFoundException"]
       }
 
