@@ -45,6 +45,8 @@ module "webhook" {
 
   resources = {
     (port_blueprint.rds.identifier) = {
+      identifier = "DbInstanceArn"
+
       api = {
         type_name       = "DbInstance"
         action          = "rds:DescribeDBInstances"
@@ -52,8 +54,7 @@ module "webhook" {
       }
 
       mapping = {
-        identifier = ".item.DbInstanceArn"
-        title      = ".item.DbInstanceIdentifier"
+        title = "DbInstanceIdentifier"
         properties = {
           "json" = ".item"
         }

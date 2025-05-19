@@ -50,21 +50,25 @@ variable "events" {
 
 variable "resources" {
   type = map(object({
+    # DbInstance for example.
+    type_name = string
+
+    # Defaults to {type_name}Arn
+    identifier = optional(string)
+
     api = optional(object({
-      # Defaults to {type_name}Arn
-      identifier = optional(string)
+      action = string
 
-      # DbInstance for example.
-      type_name = string
+      # Defaults to {type_name}Identifier
+      parameter_name = optional(string)
 
-      action          = string
+      # Error types returned by the API call, which
+      # should be treated as indicators, that the
+      # entity no longer exists.
       delete_on_error = optional(list(string), [])
     }))
     mapping = optional(object({
-      # Defaults to {type_name}Arn
-      identifier = optional(string)
-
-      # Defaults to {type_name}Arn
+      # Defaults to {type_name}Identifier
       title = optional(string)
 
       # Scary, but this is the default for webhooks.
@@ -75,6 +79,8 @@ variable "resources" {
       })
     )
     events = optional(object({
+      # Defaults to $.detail.SourceArn
+      source  = optional(string)
       pattern = any
     }))
   }))

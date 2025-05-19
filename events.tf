@@ -21,10 +21,10 @@ resource "aws_cloudwatch_event_target" "this" {
 
   input_transformer {
     input_paths = {
-      arn = "$.detail.SourceArn"
+      arn = "${each.value.events.source != null ? each.value.events.source : "$.detail.SourceArn"}"
     }
 
-    input_template = "{\"${each.value.api.type_name}Arn\": <arn> }"
+    input_template = "{\"${each.value.identifier != null ? each.value.identifier : "${each.value.type_name}Arn"}\": <arn> }"
   }
 }
 

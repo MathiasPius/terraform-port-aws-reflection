@@ -28,14 +28,14 @@ resource "aws_sfn_state_machine" "this" {
           Type = "Choice"
           Choices = [for blueprint, aws_resource in var.resources :
             {
-              Condition = "{% $states.input.${aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Arn"} != null %}"
-              Next      = "Fetch${aws_resource.api.type_name}s"
+              Condition = "{% $states.input.${aws_resource.identifier != null ? aws_resource.identifier : "${aws_resource.type_name}Arn"} != null %}"
+              Next      = "Fetch${aws_resource.type_name}s"
             }
           ]
         }
       },
       {
-        for blueprint, aws_resource in var.resources : "Fetch${aws_resource.api.type_name}s" =>
+        for blueprint, aws_resource in var.resources : "Fetch${aws_resource.type_name}s" =>
         {
           Type = "Task"
 
@@ -50,12 +50,12 @@ resource "aws_sfn_state_machine" "this" {
             ]
           )}"
           Arguments = {
-            (aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Arn") = "{% $states.input.${aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Arn"} %}"
+            (aws_resource.api.parameter_name != null ? aws_resource.api.parameter_name : "${aws_resource.type_name}Identifier") = "{% $states.input.${aws_resource.identifier != null ? aws_resource.identifier : "${aws_resource.type_name}Arn"} %}"
           }
           Assign = {
             Type   = blueprint
             Action = "create"
-            Data   = "{% $states.result.${aws_resource.api.type_name}s %}"
+            Data   = "{% $states.result.${aws_resource.type_name}s %}"
           }
           Catch = (length(aws_resource.api.delete_on_error) > 0 ? [
             {

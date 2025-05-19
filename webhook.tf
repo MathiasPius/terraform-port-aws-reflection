@@ -28,14 +28,14 @@ resource "port_webhook" "webhook" {
         blueprint      = blueprint
         entity = merge(
           {
-            identifier = resource.mapping.identifier
+            identifier = ".item.${resource.identifier != null ? resource.identifier : "${resource.type_name}Arn"}"
             properties = merge(
               resource.mapping.properties
             )
             relations = resource.mapping.relations
           },
           resource.mapping.title != null ? {
-            title = resource.mapping.title
+            title = ".item.${resource.mapping.title}"
           } : {}
         )
       },
@@ -48,7 +48,7 @@ resource "port_webhook" "webhook" {
         filter         = ".item != null and .headers.\"${var.headers.action}\" == \"delete\" and .headers.\"${var.headers.blueprint}\" == \"${blueprint}\""
         blueprint      = blueprint
         entity = {
-          identifier = resource.mapping.identifier
+          identifier = ".item.${resource.identifier != null ? resource.identifier : "${resource.type_name}Arn"}"
         }
       }
     ]
