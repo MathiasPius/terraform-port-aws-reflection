@@ -51,7 +51,7 @@ variable "events" {
 variable "resources" {
   type = map(object({
     api = optional(object({
-      # Defaults to {type_name}Identifier
+      # Defaults to {type_name}Arn
       identifier = optional(string)
 
       # DbInstance for example.
@@ -64,7 +64,7 @@ variable "resources" {
       # Defaults to {type_name}Arn
       identifier = optional(string)
 
-      # Defaults to {type_name}Identifier
+      # Defaults to {type_name}Arn
       title = optional(string)
 
       # Scary, but this is the default for webhooks.

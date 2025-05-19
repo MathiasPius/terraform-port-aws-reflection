@@ -28,7 +28,7 @@ resource "aws_sfn_state_machine" "this" {
           Type = "Choice"
           Choices = [for blueprint, aws_resource in var.resources :
             {
-              Condition = "{% $states.input.${aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Identifier"} != null %}"
+              Condition = "{% $states.input.${aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Arn"} != null %}"
               Next      = "Fetch${aws_resource.api.type_name}s"
             }
           ]
@@ -50,7 +50,7 @@ resource "aws_sfn_state_machine" "this" {
             ]
           )}"
           Arguments = {
-            (aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Identifier") = "{% $states.input.${aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Identifier"} %}"
+            (aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Arn") = "{% $states.input.${aws_resource.api.identifier != null ? aws_resource.api.identifier : "${aws_resource.api.type_name}Arn"} %}"
           }
           Assign = {
             Type   = blueprint

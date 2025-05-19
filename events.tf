@@ -24,7 +24,7 @@ resource "aws_cloudwatch_event_target" "this" {
       arn = "$.detail.SourceArn"
     }
 
-    input_template = "{\"${each.value.api.type_name}Identifier\": <arn> }"
+    input_template = "{\"${each.value.api.type_name}Arn\": <arn> }"
   }
 }
 
